@@ -18,19 +18,39 @@ const UploadPage = () => {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const title = formData.get('title');
-      const description = formData.get('description');
-      const videoFile = formData.get('video');
 
-      console.log('Upload data:', { title, description, videoFile });
-      
-      // Simulate upload delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('Video uploaded successfully!');
-      navigate('/');
-    } catch (error) {
-      toast.error('Failed to upload video');
+      const videoFile = formData.get("video");
+      if (!videoFile || (videoFile as File).size === 0) {
+        toast.error("Please select a valid video file.");
+        setUploading(false);
+        return;
+      }
+
+      // Validate title and description
+      const title = formData.get("title");
+      const description = formData.get("description");
+      if (!title || !description) {
+        toast.error("Title and description are required.");
+        setUploading(false);
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        throw new Error(errorMessage || "Failed to upload video");
+      }
+
+      const result = await response.json();
+      toast.success(result.message || "Video uploaded successfully!");
+      navigate("/");
+    } catch (error: any) {
+      console.error("Upload failed:", error);
+      toast.error(error.message || "Failed to upload video");
     } finally {
       setUploading(false);
     }
@@ -97,7 +117,7 @@ const UploadPage = () => {
                 className="w-full"
                 disabled={uploading}
               >
-                {uploading ? 'Uploading...' : 'Upload Video'}
+                {uploading ? "Uploading..." : "Upload Video"}
               </Button>
             </div>
           </form>

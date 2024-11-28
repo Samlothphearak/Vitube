@@ -35,7 +35,7 @@ const VideoCard = ({
   return (
     <div
       onClick={handleVideoClick}
-      className="cursor-pointer group transition-transform hover:-translate-y-1"
+      className="cursor-pointer group transition-transform"
     >
       <div className="relative aspect-video">
         <img

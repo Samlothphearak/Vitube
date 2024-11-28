@@ -29,7 +29,7 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    navigate('/signin');
+    navigate('/SignIn');
   };
 
   const handleSettings = () => {

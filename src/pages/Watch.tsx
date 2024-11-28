@@ -10,7 +10,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Watch = () => {
   const { id } = useParams();
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [commentText, setCommentText] = useState("");
 
   // Mock data for suggested videos

@@ -15,17 +15,32 @@ const SignIn = () => {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const email = formData.get('email');
-      const password = formData.get('password');
+      const email = formData.get("email");
+      const password = formData.get("password");
 
-      // Simulate authentication delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Sign in:', { email, password });
-      toast.success('Successfully signed in!');
-      navigate('/');
+      const response = await fetch("http://localhost:5000/api/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Successfully signed in!");
+
+        // Store the token in localStorage or state management
+        localStorage.setItem("token", data.token);
+
+        // Navigate to the home page or dashboard
+        navigate("/");
+      } else {
+        toast.error(data.message || "Failed to sign in");
+      }
     } catch (error) {
-      toast.error('Failed to sign in');
+      toast.error("Failed to sign in");
     } finally {
       setLoading(false);
     }
@@ -64,6 +79,11 @@ const SignIn = () => {
             {loading ? "Signing in..." : "Sign In"}
           </Button>
         </form>
+        <div className="text-center text-sm">
+          <Link to="/forgot-password" className="text-primary hover:underline">
+            Forgot your password?
+          </Link>
+        </div>
         <div className="text-center text-sm">
           <Link to="/sign-up" className="text-primary hover:underline">
             Don't have an account? Sign up

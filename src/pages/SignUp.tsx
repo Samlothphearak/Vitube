@@ -13,20 +13,50 @@ const SignUp = () => {
     e.preventDefault();
     setLoading(true);
 
-    try {
-      const formData = new FormData(e.currentTarget);
-      const email = formData.get('email');
-      const password = formData.get('password');
-      const username = formData.get('username');
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const username = formData.get("username") as string;
 
-      // Simulate registration delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('Sign up:', { email, password, username });
-      toast.success('Account created successfully!');
-      navigate('/sign-in');
+    // Basic validation
+    if (!email || !password || !username) {
+      toast.error("All fields are required!");
+      setLoading(false);
+      return;
+    }
+
+    // Email format check
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Invalid email format");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          username,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Account created successfully!");
+        navigate("/sign-in");
+      } else {
+        // Show error message from server response
+        toast.error(data.message || "Failed to create account");
+      }
     } catch (error) {
-      toast.error('Failed to create account');
+      toast.error("Failed to create account");
     } finally {
       setLoading(false);
     }
